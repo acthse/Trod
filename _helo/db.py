@@ -398,11 +398,12 @@ class Executer:
 
     @classmethod
     async def _fetch(
-            cls, sql: str,
-            params: Optional[Union[tuple, list]] = None,
-            rows: Optional[int] = None,
-            db: Optional[str] = None,
-            adicts: bool = True
+        cls,
+        sql: str,
+        params: Optional[Union[tuple, list]] = None,
+        rows: Optional[int] = None,
+        db: Optional[str] = None,
+        adicts: bool = True
     ) -> Union[None, util.adict, Tuple[Any, ...], FetchResult]:
 
         async with cls.pool.acquire() as connection:  # type: ignore
@@ -583,27 +584,27 @@ class EnvKey:
             cls.USER = key
 
 
-class _ExcAdapter:
-    """Exception adapter for pymysql"""
+# class _ExcAdapter:
+#     """Exception adapter for pymysql"""
 
-    _exc_map = {
-        pymysql.err.Error: err.MySQLError,
-        pymysql.err.DatabaseError: err.MySQLError,
-        pymysql.err.MySQLError: err.MySQLError,
-        pymysql.err.InternalError: err.MySQLError,
-        pymysql.err.InterfaceError: err.InterfaceError,
-        pymysql.err.DataError: err.MySQLDataError,
-        pymysql.err.IntegrityError: err.IntegrityError,
-        pymysql.err.NotSupportedError: err.NotSupportedError,
-        pymysql.err.OperationalError: err.OperationalError,
-        pymysql.err.ProgrammingError: err.ProgrammingError,
-        pymysql.err.Warning: err.MySQLWarning,
-    }  # type: Dict[Type[BaseException], Type[BaseException]]
+#     _exc_map = {
+#         pymysql.err.Error: err.MySQLError,
+#         pymysql.err.DatabaseError: err.MySQLError,
+#         pymysql.err.MySQLError: err.MySQLError,
+#         pymysql.err.InternalError: err.MySQLError,
+#         pymysql.err.InterfaceError: err.InterfaceError,
+#         pymysql.err.DataError: err.MySQLDataError,
+#         pymysql.err.IntegrityError: err.IntegrityError,
+#         pymysql.err.NotSupportedError: err.NotSupportedError,
+#         pymysql.err.OperationalError: err.OperationalError,
+#         pymysql.err.ProgrammingError: err.ProgrammingError,
+#         pymysql.err.Warning: err.MySQLWarning,
+#     }  # type: Dict[Type[BaseException], Type[BaseException]]
 
-    @classmethod
-    def err(cls) -> BaseException:
-        exc_type, exc_value, _traceback = sys.exc_info()
-        if exc_type is not None:
-            exc_cls = cls._exc_map.get(exc_type, exc_type)
-            return exc_cls(exc_value)
-        return err.ProgrammingError("No Exception info")
+#     @classmethod
+#     def err(cls) -> BaseException:
+#         exc_type, exc_value, _traceback = sys.exc_info()
+#         if exc_type is not None:
+#             exc_cls = cls._exc_map.get(exc_type, exc_type)
+#             return exc_cls(exc_value)
+#         return err.ProgrammingError("No Exception info")

@@ -45,7 +45,7 @@ class adict(dict):  # pylint: disable=invalid-name
             return self[key]
         except KeyError:
             raise AttributeError(
-                f"adict object has not attribute {key}."
+                f"'{self.__class__.__name__}' object has no attribute '{key}'"
             )
 
     def __setattr__(self, key: str, value: Any) -> None:
@@ -81,6 +81,23 @@ def adictformatter(func: Callable):
             return formatadict(result)
 
     return convert
+
+
+def import_object(name: str) -> Any:
+    """Imports an object by name.
+
+    ``import_object('x')`` is equivalent to ``import x``.
+    ``import_object('x.y.z')`` is equivalent to ``from x.y import z``.
+    """
+    if name.count(".") == 0:
+        return __import__(name)
+
+    parts = name.split(".")
+    obj = __import__(".".join(parts[:-1]), fromlist=[parts[-1]])
+    try:
+        return getattr(obj, parts[-1])
+    except AttributeError:
+        raise ImportError("No module named %s" % parts[-1])
 
 
 def asyncinit(obj: Type):
@@ -210,7 +227,7 @@ class In:
         if key in self._set:
             return key
         raise AttributeError(
-            f"{self._for} object has not attribute {name}."
+            f"'{self._for}' object has no attribute '{name}'"
         )
 
 

@@ -154,6 +154,7 @@ class Query:
         self._fread = isr
 
 
+# ClauseElement
 class Node:
 
     __slots__ = ()

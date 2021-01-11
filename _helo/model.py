@@ -30,7 +30,7 @@ JOINTYPE = util.adict(
     RIGHT='RIGHT',
 )
 _TABLENAME_REGEX = re.compile(r'([a-z]|\d)([A-Z])')
-_BUILTIN_MODEL_NAMES = ("ModelBase", "Model")
+_BUILTIN_MODEL_NAMES = ("ModelBase", "Model", "HeloModel")
 
 
 class ModelType(type):
@@ -111,23 +111,26 @@ class ModelType(type):
         return type.__new__(cls, name, bases, attrs)  # type: ignore
 
     def __getattr__(cls, name: str) -> Any:
-        if name in cls.__table__.fields_dict:
-            return cls.__table__.fields_dict[name]
+        if cls.__table__ is not None:
+            if name in cls.__table__.fields_dict:
+                return cls.__table__.fields_dict[name]
 
         raise AttributeError(
             f"'{cls.__name__}' class does not have attribute '{name}'"
         )
 
-    def __setattr__(cls, *_args: Any) -> None:
-        raise err.NotAllowedError(
-            f"Model '{cls.__name__}' class not allow set attribute")
+    # def __setattr__(cls, *_args: Any) -> None:
+    #     raise err.NotAllowedError(
+    #         f"Model '{cls.__name__}' class not allow set attribute")
 
-    def __delattr__(cls, name: str) -> None:
-        raise err.NotAllowedError(
-            f"Model '{cls.__name__}' class not allow delete attribute"
-        )
+    # def __delattr__(cls, name: str) -> None:
+    #     raise err.NotAllowedError(
+    #         f"Model '{cls.__name__}' class not allow delete attribute"
+    #     )
 
     def __repr__(cls) -> str:
+        if cls.__name__ in _BUILTIN_MODEL_NAMES:
+            return f"helo.{cls.__name__}"
         return f"Model<{cls.__name__}>"
 
     def __str__(cls) -> str:
@@ -159,7 +162,7 @@ def get_attrs(m: Union[Type[Model], Model]) -> Dict[str, Any]:
     try:
         return m.__attrs__
     except AttributeError:
-        raise err.ProgrammingError("must be ModelType")
+        raise err.ProgrammingError("Must be ModelType")
 
 
 class ModelBase:
@@ -170,7 +173,7 @@ class ModelBase:
 
     def __repr__(self) -> str:
         id_ = getattr(self, self.__table__.primary.attr, None)
-        return f"<{self.__class__.__name__} object at {id_}>"
+        return f"<{self.__class__.__name__} object {id_}>"
 
     __str__ = __repr__
 
